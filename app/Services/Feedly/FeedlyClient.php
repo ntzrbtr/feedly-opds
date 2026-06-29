@@ -20,20 +20,20 @@ use Throwable;
  * Laravel cache; the .env token acts as bootstrap. On 401 (or imminent expiry)
  * the client refreshes once and retries the original request.
  */
-final class FeedlyClient
+final readonly class FeedlyClient
 {
-    private const CACHE_ACCESS_TOKEN = 'feedly.access_token';
+    private const string CACHE_ACCESS_TOKEN = 'feedly.access_token';
 
-    private const CACHE_TOKEN_EXPIRES_AT = 'feedly.token_expires_at';
+    private const string CACHE_TOKEN_EXPIRES_AT = 'feedly.token_expires_at';
 
-    private const FEEDLY_AUTH_HEADER = 'OAuth';
+    private const string FEEDLY_AUTH_HEADER = 'OAuth';
 
     public function __construct(
-        private readonly string $baseUrl,
-        private readonly ?string $developerToken,
-        private readonly ?string $refreshToken,
-        private readonly ?string $clientId,
-        private readonly ?string $clientSecret,
+        private string $baseUrl,
+        private ?string $developerToken,
+        private ?string $refreshToken,
+        private ?string $clientId,
+        private ?string $clientSecret,
     ) {}
 
     /**
@@ -117,9 +117,9 @@ final class FeedlyClient
             $attempts++;
 
             return $callback();
-        } catch (Throwable $e) {
-            if ($attempts >= $times || ! $when($e)) {
-                throw $e;
+        } catch (Throwable $throwable) {
+            if ($attempts >= $times || ! $when($throwable)) {
+                throw $throwable;
             }
 
             if ($sleepMs > 0) {
@@ -170,7 +170,7 @@ final class FeedlyClient
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
             'grant_type' => 'refresh_token',
-        ], fn ($value): bool => filled($value));
+        ], filled(...));
 
         try {
             $response = Http::asForm()
@@ -178,9 +178,9 @@ final class FeedlyClient
 
             $response->throw();
             $body = $response->json() ?? [];
-        } catch (Throwable $e) {
-            Log::error('Feedly token refresh failed', ['exception' => $e]);
-            throw new RuntimeException('Feedly: token refresh failed.', 0, $e);
+        } catch (Throwable $throwable) {
+            Log::error('Feedly token refresh failed', ['exception' => $throwable]);
+            throw new RuntimeException('Feedly: token refresh failed.', 0, $throwable);
         }
 
         $token = $body['access_token'] ?? null;

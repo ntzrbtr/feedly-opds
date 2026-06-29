@@ -15,6 +15,7 @@ class FortifyServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
+    #[\Override]
     public function register(): void
     {
         //
@@ -43,9 +44,9 @@ class FortifyServiceProvider extends ServiceProvider
      */
     private function configureViews(): void
     {
-        Fortify::loginView(fn () => view('livewire.auth.login'));
-        Fortify::resetPasswordView(fn () => view('livewire.auth.reset-password'));
-        Fortify::requestPasswordResetLinkView(fn () => view('livewire.auth.forgot-password'));
+        Fortify::loginView(fn (): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View => view('livewire.auth.login'));
+        Fortify::resetPasswordView(fn (): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View => view('livewire.auth.reset-password'));
+        Fortify::requestPasswordResetLinkView(fn (): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View => view('livewire.auth.forgot-password'));
     }
 
     /**

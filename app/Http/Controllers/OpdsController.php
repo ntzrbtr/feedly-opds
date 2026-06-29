@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class OpdsController extends Controller
 {
-    private const ATOM_CONTENT_TYPE = 'application/atom+xml; charset=UTF-8';
+    private const string ATOM_CONTENT_TYPE = 'application/atom+xml; charset=UTF-8';
 
     public function __construct(
         private readonly FeedlyClient $feedly,
@@ -63,7 +63,7 @@ final class OpdsController extends Controller
     public function entry(Request $request, string $entryId): Response
     {
         $entry = $this->lookupEntry($entryId);
-        if ($entry === null) {
+        if (!$entry instanceof \App\Services\Feedly\Dtos\Entry) {
             throw new NotFoundHttpException('Entry not found.');
         }
 
@@ -80,7 +80,7 @@ final class OpdsController extends Controller
     public function download(string $entryId): Response
     {
         $entry = $this->lookupEntry($entryId);
-        if ($entry === null || $entry->url === null) {
+        if (!$entry instanceof \App\Services\Feedly\Dtos\Entry || $entry->url === null) {
             throw new NotFoundHttpException('Entry or download not found.');
         }
 
@@ -108,8 +108,8 @@ final class OpdsController extends Controller
 
         try {
             return $this->feedly->entry($entryId);
-        } catch (RuntimeException $e) {
-            Log::info('Feedly single entry lookup failed', ['entryId' => $entryId, 'exception' => $e]);
+        } catch (RuntimeException $runtimeException) {
+            Log::info('Feedly single entry lookup failed', ['entryId' => $entryId, 'exception' => $runtimeException]);
 
             return null;
         }

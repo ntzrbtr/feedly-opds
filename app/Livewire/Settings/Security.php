@@ -36,10 +36,10 @@ class Security extends Component
                 'current_password' => $this->currentPasswordRules(),
                 'password' => $this->passwordRules(),
             ]);
-        } catch (ValidationException $e) {
+        } catch (ValidationException $validationException) {
             $this->reset('current_password', 'password', 'password_confirmation');
 
-            throw $e;
+            throw $validationException;
         }
 
         Auth::user()->update([

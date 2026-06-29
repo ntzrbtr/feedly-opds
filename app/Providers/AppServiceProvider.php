@@ -16,6 +16,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
+    #[\Override]
     public function register(): void
     {
         $this->registerFeedlyClient();
@@ -25,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
 
     private function registerFeedlyClient(): void
     {
-        $this->app->singleton(FeedlyClient::class, function ($app): FeedlyClient {
+        $this->app->singleton(function ($app): \App\Services\Feedly\FeedlyClient {
             /** @var array<string, mixed> $config */
             $config = $app->make('config')->get('feedly');
 
@@ -41,7 +42,7 @@ class AppServiceProvider extends ServiceProvider
 
     private function registerInstaparserClient(): void
     {
-        $this->app->singleton(InstaparserClient::class, function ($app): InstaparserClient {
+        $this->app->singleton(function ($app): \App\Services\Instapaper\InstaparserClient {
             /** @var array<string, mixed> $config */
             $config = $app->make('config')->get('instaparser');
 
@@ -55,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
 
     private function registerOpdsDocumentBuilder(): void
     {
-        $this->app->singleton(OpdsDocumentBuilder::class, function ($app): OpdsDocumentBuilder {
+        $this->app->singleton(function ($app): \App\Services\Opds\OpdsDocumentBuilder {
             /** @var array<string, mixed> $config */
             $config = $app->make('config')->get('opds');
 

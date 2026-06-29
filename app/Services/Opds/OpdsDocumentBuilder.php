@@ -19,18 +19,18 @@ use Stringable;
  * Die XML-Erzeugung erfolgt mit {@see AtomBuilder}, was den
  * Slate of Namespaces (opds, dc, thr) auf vereinheitlichte Weise handhabt.
  */
-final class OpdsDocumentBuilder
+final readonly class OpdsDocumentBuilder
 {
-    public const NS_ATOM = 'http://www.w3.org/2005/Atom';
+    public const string NS_ATOM = 'http://www.w3.org/2005/Atom';
 
-    public const NS_OPDS = 'http://opds-spec.org/2010/catalog';
+    public const string NS_OPDS = 'http://opds-spec.org/2010/catalog';
 
-    public const NS_DC = 'http://purl.org/dc/elements/1.1/';
+    public const string NS_DC = 'http://purl.org/dc/elements/1.1/';
 
     public function __construct(
-        private readonly string $title,
-        private readonly string $author,
-        private readonly Stringable|string $authorUri,
+        private string $title,
+        private string $author,
+        private Stringable|string $authorUri,
     ) {}
 
     /**
@@ -50,6 +50,7 @@ final class OpdsDocumentBuilder
                 $summary->addAttribute('type', 'text');
                 $this->addCData($summary, $link['summary']);
             }
+
             $this->addLink($entry, $link['href'], $link['rel'], $link['type']);
         }
 
@@ -113,7 +114,7 @@ final class OpdsDocumentBuilder
 
         $updated = $entry->published ?? Carbon::now();
         $entryEl->addChild('updated', $updated->toAtomString());
-        if ($entry->published) {
+        if ($entry->published instanceof \Carbon\Carbon) {
             $entryEl->addChild('published', $entry->published->toAtomString());
         }
 
@@ -161,6 +162,7 @@ final class OpdsDocumentBuilder
 
         $author = $atom->addChild('author');
         $author->addChild('name', $this->escape($this->author));
+
         $uri = (string) $this->authorUri;
         if ($uri !== '') {
             $author->addChild('uri', $this->escape($uri));
@@ -181,7 +183,7 @@ final class OpdsDocumentBuilder
     {
         $node = dom_import_simplexml($parent);
         $owner = $node->ownerDocument;
-        if ($owner === null) {
+        if (!$owner instanceof \DOMDocument) {
             $parent[0] = $text;
 
             return;

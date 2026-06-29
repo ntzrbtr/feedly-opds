@@ -2,6 +2,9 @@ includes:
     - vendor/larastan/larastan/extension.neon
     - vendor/nesbot/carbon/extension.neon
 
+rules:
+    - Spatie\Ray\PHPStan\RemainingRayCallRule
+
 parameters:
     paths:
         - app/
@@ -9,5 +12,12 @@ parameters:
         - config/
         - database/
         - routes/
-
     level: 7
+
+# Fix for bug in Larastan/Bladestan
+# @see https://github.com/larastan/larastan/issues/2361
+# @see https://github.com/bladestan/bladestan/issues/166
+#services:
+#    -
+#        class: Illuminate\Filesystem\Filesystem
+#        autowired: self

@@ -18,14 +18,14 @@ use Throwable;
  * Ergebnisse werden pro URL gecacht, um Lese-Apps nicht wiederholt zu beauftragen
  * und die externen Rate-Limits des Dienstes zu schonen.
  */
-final class InstaparserClient
+final readonly class InstaparserClient
 {
-    private readonly ?string $apiKey;
+    private ?string $apiKey;
 
     public function __construct(
-        private readonly string $baseUrl,
+        private string $baseUrl,
         ?string $apiKey,
-        private readonly int $cacheTtl,
+        private int $cacheTtl,
     ) {
         $this->apiKey = filled($apiKey) ? $apiKey : null;
     }
@@ -65,10 +65,10 @@ final class InstaparserClient
         }
 
         $content = new ArticleContent(
-            title: self::stringOrNull($payload['title'] ?? null),
-            author: self::stringOrNull($payload['author'] ?? null),
-            url: self::stringOrNull($payload['url'] ?? $url),
-            html: self::stringOrNull($payload['content'] ?? '') ?? '',
+            title: $this->stringOrNull($payload['title'] ?? null),
+            author: $this->stringOrNull($payload['author'] ?? null),
+            url: $this->stringOrNull($payload['url'] ?? $url),
+            html: $this->stringOrNull($payload['content'] ?? '') ?? '',
         );
 
         Cache::put($cacheKey, $content, now()->addSeconds($this->cacheTtl));
@@ -76,7 +76,7 @@ final class InstaparserClient
         return $content;
     }
 
-    private static function stringOrNull(mixed $value): ?string
+    private function stringOrNull(mixed $value): ?string
     {
         if (! is_string($value) || $value === '') {
             return null;
